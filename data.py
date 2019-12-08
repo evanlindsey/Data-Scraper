@@ -15,10 +15,8 @@ class DataScraper:
 
     url = 'https://data.gov'
     home_title = 'Data.gov'
-    search_xpath = '//input[@type=\'search\']'
 
-    catalog_title = 'DATA CATALOG'
-    catalog_header_xpath = '//div[@class=\'main-heading\']/h1'
+    search_xpath = '//input[@type=\'search\']'
     next_icon_xpath = '//li/a[text()=\'»\']'
 
     name_class = 'dataset-heading'
@@ -41,9 +39,6 @@ class DataScraper:
         search.send_keys(Keys.RETURN)
 
     def scrape_page(self):
-        header = self.wait.until(EC.visibility_of_element_located(
-            (By.XPATH, self.catalog_header_xpath)))
-        assert self.catalog_title in header.text, f'Results header equals {self.catalog_title}'
         html = self.driver.execute_script(
             'return document.documentElement.innerHTML;')
         return BeautifulSoup(html, 'html.parser')
@@ -54,21 +49,25 @@ class DataScraper:
         results = soup.findAll('div', {'class': 'dataset-content'})
         for res in results:
             entry = {}
-            name = res.find('h3', {'class': self.name_class})
-            entry["Name"] = name.find(
-                'a').get_text() if name is not None else ""
+            # name
+            name = res.find('h3', {'class': self.name_class}).a
+            entry["Name"] = name.get_text() if name is not None else ""
+            # organization type
             org_type = res.find('div', {'class': self.org_type_class})
-            entry["OrganizationType"] = org_type.find('span').find(
-                'span').get_text() if org_type is not None else ""
-            contents = res.find('div', {'class': self.contents_class})
-            entry["Organization"] = contents.find('p').get_text()[
-                :-2] if contents is not None else ""
-            entry["Description"] = contents.find(
-                'div').get_text() if contents is not None else ""
+            entry["OrganizationType"] = org_type.span.span.get_text(
+            ) if org_type is not None else ""
+            # organization
+            organization = res.find('div', {'class': self.contents_class}).p
+            entry["Organization"] = organization.get_text(
+            )[:-2] if organization is not None else ""
+            # description
+            description = res.find('div', {'class': self.contents_class}).div
+            entry["Description"] = description.get_text(
+            ) if description is not None else ""
+            # formats
             formats = res.find('ul', {'class': self.formats_class})
             if formats is not None:
-                format_list = [x.find('a').get_text()
-                               for x in formats.findAll('li')]
+                format_list = [x.a.get_text() for x in formats.findAll('li')]
                 entry["Formats"] = ','.join(format_list)
             else:
                 entry["Formats"] = ""
@@ -83,22 +82,20 @@ class DataScraper:
         except NoSuchElementException:
             return False
 
+    def get_results(self, count):
+        data = self.pull_data()
+        while int(len(data)) < int(count):
+            if self.check_pagination():
+                data.extend(self.pull_data())
+            else:
+                break
+        return data[0:int(count)]
+
     def teardown(self):
         self.driver.quit()
 
 
 class Main():
-
-    scraper = None
-
-    def get_results(self, count):
-        data = self.scraper.pull_data()
-        while int(len(data)) < int(count):
-            if self.scraper.check_pagination():
-                data.extend(self.scraper.pull_data())
-            else:
-                break
-        return data[0:int(count)]
 
     def write_results(self, results):
         print(f'Result Set Count:\n{len(results)}')
@@ -106,17 +103,21 @@ class Main():
             json.dump(results, outfile)
 
     def run(self):
+        scraper = None
         try:
+            # input
             term = input('Enter a term to search on Data.gov:\n')
             count = input('Enter the target result set count:\n')
-            self.scraper = DataScraper()
-            self.scraper.search_term(term)
-            results = self.get_results(count)
+            # actions
+            scraper = DataScraper()
+            scraper.search_term(term)
+            results = scraper.get_results(count)
+            # output
             self.write_results(results)
         except Exception as e:
             print(f'Something went wrong:\n{str(e)}')
         finally:
-            self.scraper.teardown()
+            scraper.teardown()
 
 
 if __name__ == '__main__':
