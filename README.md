@@ -1,4 +1,4 @@
-# SCRAPER
+# DATA SCRAPER
 
 ## Install Dependencies
 ```
