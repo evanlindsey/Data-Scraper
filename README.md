@@ -1,4 +1,4 @@
-# DATA SCRAPER
+# DATA SCRAPERS
 
 ## Install Dependencies
 ```
@@ -7,7 +7,7 @@
 
 ### Add [ChromeDriver](https://chromedriver.chromium.org/) to 'drivers' Directory
 
-## Run Data.gov Scraper
+## Run Data.gov Search Scraper
 ```
 python data.py
 ```
@@ -24,7 +24,12 @@ Enter the target result set count:
 50
 ```
 
-## Run IMDB Movie Scraper
+## Run IMDB Top 250 Movies Scraper
 ```
-python movie.py
+python movies.py
+```
+
+## Run Crossfit Affiliates Scraper
+```
+python affiliates.py
 ```

@@ -5,12 +5,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
 url = 'https://www.imdb.com/chart/top'
 
 
 class UiScraper:
 
     driver = None
+
     header_css = 'h1.header'
     header_text = 'Top Rated Movies'
 
@@ -34,7 +36,7 @@ class UiScraper:
         return BeautifulSoup(html, 'html.parser')
 
 
-class ApiScraper:
+class HttpScraper:
 
     def scrape(self):
         html = requests.get(url).text
@@ -52,14 +54,28 @@ class Actions:
             print(item)
 
 
-actions = Actions()
+class Main:
 
-api_scraper = ApiScraper()
-soup = api_scraper.scrape()
-titles = actions.get_titles(soup)
-actions.print_list(titles)
+    def run(self):
+        try:
+            # input
+            method = input(
+                'Enter (1) to use HTTP Request\nEnter (2) to use Web UI\n')
+            if method == '1':
+                scraper = HttpScraper()
+            elif method == '2':
+                scraper = UiScraper()
+            else:
+                raise Exception('Invalid input')
+            # actions
+            soup = scraper.scrape()
+            actions = Actions()
+            titles = actions.get_titles(soup)
+            # output
+            actions.print_list(titles)
+        except Exception as e:
+            print(f'Something went wrong:\n{str(e)}')
 
-ui_scraper = UiScraper()
-soup = ui_scraper.scrape()
-titles = actions.get_titles(soup)
-actions.print_list(titles)
+
+if __name__ == '__main__':
+    Main().run()

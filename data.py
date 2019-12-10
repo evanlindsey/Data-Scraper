@@ -95,7 +95,7 @@ class DataScraper:
         self.driver.quit()
 
 
-class Main():
+class Main:
 
     def write_results(self, results):
         print(f'Result Set Count:\n{len(results)}')
@@ -103,7 +103,6 @@ class Main():
             json.dump(results, outfile)
 
     def run(self):
-        scraper = None
         try:
             # input
             term = input('Enter a term to search on Data.gov:\n')
