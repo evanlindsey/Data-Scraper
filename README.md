@@ -29,6 +29,13 @@ Enter the target result set count:
 python movies.py
 ```
 
+### Select HTTP Request or Web UI
+```
+Enter (1) to use HTTP Request
+Enter (2) to use Web UI
+1
+```
+
 ## Run Crossfit Affiliates Scraper
 ```
 python affiliates.py
