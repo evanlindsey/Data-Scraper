@@ -40,7 +40,9 @@ class DataScraper:
         search.clear()
         search.send_keys(term)
         search.send_keys(Keys.RETURN)
-        self.wait.until(lambda x: self.data_title in self.driver.title)
+        pageLoad = self.wait.until(
+            lambda driver: driver.title == self.data_title)
+        assert pageLoad == True, 'Datasets page is loaded'
 
     def scrape_page(self):
         html = self.driver.execute_script(
