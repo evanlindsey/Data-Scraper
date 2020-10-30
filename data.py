@@ -1,6 +1,7 @@
 import json
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -15,6 +16,7 @@ class DataScraper:
 
     url = 'https://data.gov'
     home_title = 'Data.gov'
+    data_title = 'Datasets - Data.gov'
 
     search_xpath = '//input[@type=\'search\']'
     next_icon_xpath = '//li/a[text()=\'»\']'
@@ -25,7 +27,8 @@ class DataScraper:
     formats_class = 'dataset-resources unstyled'
 
     def __init__(self):
-        self.driver = webdriver.Chrome('./drivers/chromedriver.exe')
+        self.driver = webdriver.Firefox(
+            executable_path=GeckoDriverManager().install())
         self.wait = WebDriverWait(self.driver, 10)
         self.driver.get(self.url)
         self.driver.maximize_window()
@@ -37,6 +40,7 @@ class DataScraper:
         search.clear()
         search.send_keys(term)
         search.send_keys(Keys.RETURN)
+        self.wait.until(lambda x: self.data_title in self.driver.title)
 
     def scrape_page(self):
         html = self.driver.execute_script(

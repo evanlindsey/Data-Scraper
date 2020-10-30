@@ -5,8 +5,6 @@
 ./init.ps1
 ```
 
-### Add [ChromeDriver](https://chromedriver.chromium.org/) to 'drivers' Directory
-
 ## Run Data.gov Search Scraper
 ```
 python data.py

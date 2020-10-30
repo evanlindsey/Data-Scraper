@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -17,7 +18,7 @@ class UiScraper:
     header_text = 'Top Rated Movies'
 
     def init_driver(self):
-        self.driver = webdriver.Chrome('./drivers/chromedriver.exe')
+        self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
         self.driver.get(url)
         self.driver.maximize_window()
 
